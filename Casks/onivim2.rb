@@ -1,19 +1,19 @@
-VERSION = "0.5.3"
-SHA_256 = "8caa44ace2b0ea2c0dcf2165cb44b1485f0d2147a297edc7d3bae2f21741eca7"
+VERSION = "0.5.3".freeze
+SHA_256 = "8caa44ace2b0ea2c0dcf2165cb44b1485f0d2147a297edc7d3bae2f21741eca7".freeze
 
 # Defined in the website js
-FIREBASE_API_KEY = "AIzaSyDxflsfyd2gloxgWJ-GFtPM46tz-TtOXh8"
-ONIVIM_BASE_URL = "https://v2.onivim.io"
-LICENSE_KEY_ENV = "HOMEBREW_ONIVIM_SERIAL"
+FIREBASE_API_KEY = "AIzaSyDxflsfyd2gloxgWJ-GFtPM46tz-TtOXh8".freeze
+ONIVIM_BASE_URL = "https://v2.onivim.io".freeze
+LICENSE_KEY_ENV = "HOMEBREW_ONIVIM_SERIAL".freeze
 ZAP_LIST = [
   "~/.config/oni2",
   "~/Library/Preferences/com.outrunlabs.onivim2.plist",
   "~/Library/Saved Application State/com.outrunlabs.onivim2.savedState",
-]
+].freeze
 
 # Custom Download strategy to bypass @cached_location name length limitation
 class OniVimDownloadStrategy < CurlDownloadStrategy
-  #noinspection RubyArgCount
+  # noinspection RubyArgCount
   def initialize(url, name, version, **meta)
     super
     @cached_location = Pathname.new("#{HOMEBREW_CACHE}/downloads/OniVim2-#{version}.app")
@@ -64,25 +64,24 @@ class AuthenticationProvider
     custom_token_url = URI.parse("https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken" \
                                    "?key=#{FIREBASE_API_KEY}")
 
-    custom_token_response = Net::HTTP.post_form(custom_token_url, {"returnSecureToken" => "true", "token" => token})
+    custom_token_response = Net::HTTP.post_form(custom_token_url, { "returnSecureToken" => "true", "token" => token })
     JSON.parse(custom_token_response.body)["idToken"]
   end
 end
 
 cask "onivim2" do
-  version "#{VERSION}"
-  sha256 "#{SHA_256}"
+  version VERSION.to_s
+  sha256 SHA_256.to_s
 
   url do
     [
       "#{ONIVIM_BASE_URL}/downloads/Onivim2.dmg?channel=stable&token=#{AuthenticationProvider.new.download_token}",
-      using: OniVimDownloadStrategy, referer: "https://github.com/marblenix/homebrew-onivim2"
+      { using: OniVimDownloadStrategy, referer: "https://github.com/marblenix/homebrew-onivim2" },
     ]
   end
-
   name "OniVim2"
   desc "Native, lightweight modal code editor"
-  homepage "#{ONIVIM_BASE_URL}"
+  homepage ONIVIM_BASE_URL.to_s
 
   conflicts_with cask: "onivim2-nightly"
 
